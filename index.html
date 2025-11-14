@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Virtuálny kamarát — kuchyňa</title>
+  <link rel="stylesheet" href="dizajn.css">
+</head>
+<body>
+  
+  <header>
+    <h1>Virtuálny kamarát</h1>
+    <p id="game-version" aria-hidden="true">verzia 0.1 (kuchyňa)</p>
+  </header>
+
+  <main>
+    <!-- HUD / status -->
+    <section id="status" aria-label="Stav kamaráta">
+      <p>Zdravie: <span id="health">--</span></p>
+      <p>Hlad: <span id="hunger">--</span></p>
+      <p>Radosť: <span id="happiness">--</span></p>
+      <p>Energia: <span id="energy">--</span></p>
+    </section>
+
+    <!-- Hlavná plocha hry -->
+    <section id="game-area" aria-label="Herná plocha">
+      
+      <!-- Kuchynská linka -->
+      <div id="counter"></div>
+      <!-- Rúra -->
+      <div id="oven"></div>
+      <!-- Drez -->
+      <div id="sink"></div>
+      <!-- Okno -->
+      <div id="window"></div>
+      
+      <!-- Miesto pre postavičku -->
+      <div id="pet-container" role="img" aria-label="Vizuálny reprezentant kamaráta"></div>
+
+      <!-- Prasiatko -->
+      <div id="pig">
+        <div class="pig-body"></div>
+        <div class="pig-head">
+          <div class="pig-ear left"></div>
+          <div class="pig-ear right"></div>
+          <div class="pig-eye left"></div>
+          <div class="pig-eye right"></div>
+          <div class="pig-nose"></div>
+        </div>
+      </div>
+
+      <!-- stavové hlášky / udalosti -->
+      <div id="feed-notification" aria-live="polite"></div>
+    </section>
+
+    <!-- Ovládacie prvky -->
+    <section id="controls" aria-label="Ovládanie">
+      <h2>Ovládanie</h2>
+      <div class="control">
+        <button type="button" data-action="feed" onclick="setTimeout(feed, 5000)">Nakŕmiť</button>
+        <button type="button" data-action="play" onclick="play()">Hrať sa</button>
+        <button type="button" data-action="sleep" onclick="sleep()">Poslať spať</button>
+        <button type="button" data-action="clean" onclick="wash()">Umyť</button>
+      </div>
+
+      <div id="inventory" aria-label="Inventár">
+        <h3>Inventár</h3>
+        <ul></ul>
+      </div>
+    </section>
+
+    <!-- Informácie o dennom cykle / čas -->
+    <section id="day-cycle" aria-label="Denný cyklus">
+      <p>Deň: <span id="day-number">--</span></p>
+      <p>Čas: <span id="time-of-day">--</span></p>
+    </section>
+  </main>
+
+  <aside id="logs" aria-label="Záznam udalostí">
+    <h2>Deník</h2>
+    <ul></ul>
+  </aside>
+
+  <footer>
+    <p>&copy; 2025 Tvoje meno — projekt: Virtuálny kamarát (kuchyňa)</p>
+  </footer>
+
+  <!-- JavaScript -->
+  <script defer src="app.js"></script>
+</body>
+</html>

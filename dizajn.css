@@ -1,0 +1,130 @@
+/* Základné nastavenia */
+body {
+  font-family: sans-serif;
+  background-color: #f0f0f0;
+  margin: 0;
+  padding: 0;
+}
+
+header, footer {
+  text-align: center;
+  padding: 10px;
+  background-color: #ddd;
+}
+
+main {
+  max-width: 600px;
+  margin: 20px auto;
+}
+
+#status p {
+  margin: 5px 0;
+  font-size: 16px;
+}
+
+/* Herná plocha ako kuchyňa s obrázkom na pozadí */
+#game-area {
+  position: relative;
+  width: 500px;
+  height: 300px;
+  margin: 20px auto;
+  border: 2px solid #333;
+  border-radius: 10px;
+  background: url('https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse1.mm.bing.net%2Fth%2Fid%2FOIP.yQLVGhLSuAfi-7jdwDq3UQHaHa%3Fpid%3DApi%26ucfimg%3D1&f=1&ipt=3217eb0f7b487e8212d69960f66edf02095bc21e6ce48a4e01bc6c20bfec9ccd&ipo=images') no-repeat center bottom;
+  background-size: contain;
+  box-shadow: inset 0 0 30px rgba(0,0,0,0.1);
+  overflow: visible;
+}
+
+/* Miesto pre postavičku prasiatka */
+#pet-container {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  background-color: yellow;
+  border-radius: 50%;
+  left: 200px;
+  top: 150px;
+  z-index: 10;
+}
+
+/* Prasiatko */
+#pig {
+  position: absolute;
+  bottom: 5px;
+  left: 220px;
+  width: 120px;
+  height: 140px;
+  z-index: 15;
+}
+
+.pig-body {
+  width: 100px;
+  height: 80px;
+  background: pink;
+  border-radius: 50px 50px 40px 40px;
+  margin: 0 auto;
+  position: absolute;
+  bottom: -5px;
+}
+
+.pig-head {
+  width: 90px;
+  height: 80px;
+  background: pink;
+  border-radius: 50%;
+  position: absolute;
+  top: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.pig-ear {
+  width: 25px;
+  height: 30px;
+  background: pink;
+  border-radius: 40% 40% 0 0;
+  position: absolute;
+  top: -10px;
+}
+
+.pig-ear.left { left: 10px; transform: rotate(-15deg); }
+.pig-ear.right { right: 10px; transform: rotate(15deg); }
+
+.pig-eye {
+  width: 12px;
+  height: 12px;
+  background: black;
+  border-radius: 50%;
+  position: absolute;
+  top: 25px;
+}
+
+.pig-eye.left { left: 25px; }
+.pig-eye.right { right: 25px; }
+
+.pig-nose {
+  width: 35px;
+  height: 25px;
+  background: #ffb6c1;
+  border-radius: 20px;
+  position: absolute;
+  top: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  box-shadow: -6px 0 0 2px #ff8aa6 inset, 6px 0 0 2px #ff8aa6 inset;
+}
+
+/* Stavové hlášky */
+#feed-notification {
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255,255,255,0.8);
+  padding: 3px 8px;
+  border-radius: 5px;
+  font-size: 14px;
+  color: #333;
+  z-index: 20;
+}
