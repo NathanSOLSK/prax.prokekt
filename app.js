@@ -5,13 +5,17 @@
     let energy = 30;
     
     let dayNumber = 0;
-    let timeOfDay = 0;
+    let timeOfDay = 20;
 
     let speed = 0.01;
 
     let gameIsRunning = true;
 
-   
+    
+    sleepBtn.disabled = true;
+    let sleepCooldown = false;
+    
+    
 
 
    function render() {
@@ -20,19 +24,36 @@
     document.getElementById("happiness").textContent = happiness;
     document.getElementById("energy").textContent = energy;
     document.getElementById("day-number").textContent = dayNumber;
-    
-   
-   
-}
+   }
 
-    function gameLoop() {
-            if (gameIsRunning) {
-                lowerStats()
-                feed()
-                
-                
-            }
-        }
+    
+    function delayedAction(action, buttonId, ms = 1000000) {
+    const btn = document.getElementById(buttonId);
+    if (!btn) return;
+
+    btn.disabled = true;
+    sleepCooldown = true;
+
+    setTimeout(() => {
+        action();        // vykoná funkciu po 5 sekundách
+        render();
+        btn.disabled = false;
+        sleepCooldown = false;
+        updateSleepButton();
+    }, ms);
+}
+function updateSleepButton() {
+    const btn = document.getElementById('sleepBtn');
+    if (!btn) return;
+
+    if (!sleepCooldown && timeOfDay > 20) {
+        btn.disabled = false;
+    } else {
+        btn.disabled = true;
+    }
+}
+setInterval(updateSleepButton, 100);
+
 
         
 
@@ -50,8 +71,7 @@
         hunger += 3;
         energy += 1;
         health += 1;
-        render();
-        
+     
     }
 
     function wash() {
@@ -59,24 +79,24 @@
         happiness += 3;
         energy += 2;
         health += 5;
-        render();
-        
     }
 
     function sleep() {
          if (!gameIsRunning) return;
-        energy += 10;
-        health += 5;
-        render();
-        
+            
+         
+             energy = 30;
+             health += 5;
+             dayNumber += 1;
+             timeOfDay = 8;
+      
     }
 
     function play() {
         if (!gameIsRunning) return;
         happiness += 5;
         energy -= 3;
-        render();
-        
+      
     }
     
 
@@ -160,7 +180,7 @@ function dayCounter() {
 
      render()
 }
-setInterval(dayCounter, 300000)
+
 
 function updateTime() {
     if (!gameIsRunning) return;
@@ -179,13 +199,14 @@ function updateTime() {
   setInterval(updateTime, 200);
 
 
-
+render()
+enableSleep()
  
 
 
 
 
 
-render()
+
 
 

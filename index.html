@@ -58,10 +58,10 @@
     <section id="controls" aria-label="Ovládanie">
       <h2>Ovládanie</h2>
       <div class="control">
-        <button type="button" data-action="feed" onclick="setTimeout(feed, 5000)">Nakŕmiť</button>
-        <button type="button" data-action="play" onclick="play()">Hrať sa</button>
-        <button type="button" data-action="sleep" onclick="setTimeout(sleep, 5000)">Poslať spať</button>
-        <button type="button" data-action="clean" onclick="setTimeout(wash, 5000)">Umyť</button>
+        <button id="feedBtn" type="button" data-action="feed" onclick="delayedAction(feed, 'feedBtn' , 5000)">Nakŕmiť</button>
+        <button id="playBtn" type="button" data-action="play" onclick="play()">Hrať sa</button>
+        <button id="sleepBtn" type="button" data-action="sleep" onclick="delayedAction(sleep, 'sleepBtn', 10000 )">Poslať spať</button>
+        <button id="washBtn" type="button" data-action="clean" onclick="delayedAction(wash, 'washBtn' , 10)">Umyť</button>
       </div>
 
       <div id="inventory" aria-label="Inventár">
