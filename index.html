@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Virtuálny kamarát — kuchyňa</title>
   <link rel="stylesheet" href="dizajn.css">
+   <link rel="stylesheet" href="animation.css">
 </head>
 <body>
   
@@ -16,7 +17,7 @@
   <main>
     <!-- HUD / status -->
     <section id="status" aria-label="Stav kamaráta">
-      <p>Zdravie: <span id="health">--</span></p>
+      <p>Cleaness: <span id="cleaness">--</span></p>
       <p>Hlad: <span id="hunger">--</span></p>
       <p>Radosť: <span id="happiness">--</span></p>
       <p>Energia: <span id="energy">--</span></p>
@@ -39,16 +40,21 @@
       <div id="pet-container" role="img" aria-label="Vizuálny reprezentant kamaráta"></div>
 
       <!-- Prasiatko -->
-      <div id="pig">
-        <div class="pig-body"></div>
-        <div class="pig-head">
-          <div class="pig-ear left"></div>
-          <div class="pig-ear right"></div>
-          <div class="pig-eye left"></div>
-          <div class="pig-eye right"></div>
-          <div class="pig-nose"></div>
-        </div>
-      </div>
+<!-- Prasiatko -->
+<div id="pig">
+  <div class="pig-body"></div>
+  <div class="pig-head">
+    <div class="pig-ear left"></div>
+    <div class="pig-ear right"></div>
+    <div class="pig-eye left"></div>
+    <div class="pig-eye right"></div>
+    <div class="pig-nose"></div>
+  </div>
+
+  <!-- Špina + animácia kúpeľa -->
+  <div id="dirt-layer"></div>
+  <div id="bath-animation"></div>
+</div>
 
       <!-- stavové hlášky / udalosti -->
       <div id="feed-notification" aria-live="polite"></div>
@@ -61,7 +67,7 @@
         <button id="feedBtn" type="button" data-action="feed" onclick="delayedAction(feed, 'feedBtn' , 5000)">Nakŕmiť</button>
         <button id="playBtn" type="button" data-action="play" onclick="play()">Hrať sa</button>
         <button id="sleepBtn" type="button" data-action="sleep" onclick="delayedAction(sleep, 'sleepBtn', 10000 )">Poslať spať</button>
-        <button id="washBtn" type="button" data-action="clean" onclick="delayedAction(wash, 'washBtn' , 10000)">Umyť</button>
+        <button id="washBtn" type="button" data-action="clean" onclick="wash()">Umyť</button>
       </div>
 
       <div id="inventory" aria-label="Inventár">
