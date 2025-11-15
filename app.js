@@ -5,14 +5,17 @@
     let energy = 30;
     
     let dayNumber = 0;
-    let timeOfDay = 20;
+    let timeOfDay = 0;
 
     let speed = 0.01;
 
     let gameIsRunning = true;
 
     
-    sleepBtn.disabled = true;
+
+    
+    let buttonLocked = false;
+
     let sleepCooldown = false;
     
     
@@ -28,18 +31,27 @@
 
     
     function delayedAction(action, buttonId, ms = 1000000) {
+        if (buttonLocked) return;
+        buttonLocked = true;
+
     const btn = document.getElementById(buttonId);
     if (!btn) return;
 
-    btn.disabled = true;
+    const allButtons = document.querySelectorAll('#controls button')
+    allButtons.forEach(b => b.disabled = true)
+
+   
+
     sleepCooldown = true;
 
     setTimeout(() => {
         action();        // vykoná funkciu po 5 sekundách
         render();
-        btn.disabled = false;
+        
         sleepCooldown = false;
         updateSleepButton();
+        buttonLocked = false;
+        allButtons.forEach(b => b.disabled = false);
     }, ms);
 }
 function updateSleepButton() {
@@ -71,6 +83,8 @@ setInterval(updateSleepButton, 100);
         hunger += 3;
         energy += 1;
         health += 1;
+        
+        
      
     }
 
@@ -84,20 +98,22 @@ setInterval(updateSleepButton, 100);
     function sleep() {
          if (!gameIsRunning) return;
             
-         
              energy = 30;
              health += 5;
              dayNumber += 1;
              timeOfDay = 8;
-      
     }
 
     function play() {
         if (!gameIsRunning) return;
+        delayedAction(() => {
+        buttonLocked = true;
         happiness += 5;
         energy -= 3;
-      
+}, "playBtn", 500);
     }
+      
+    
     
 
      function gameOver() {
@@ -172,7 +188,7 @@ function decreaseEnergy() {
      gameOver()
    
 }
-setInterval(decreaseEnergy, 6000);
+setInterval(decreaseEnergy, 10000);
 
 function dayCounter() {
     if (!gameIsRunning) return;
