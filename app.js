@@ -1,16 +1,15 @@
-let cleaness = 4;
+let cleaness = 30;
 let hunger = 50;
-let happiness = 70;
+let happiness = 50;
 let energy = 30;
 
-
 let dayNumber = 0;
-let timeOfDay = 20;
+let timeOfDay = 19;
 
 let speed = 0.01;
 
 let gameIsRunning = true;
-
+let actionInProgress = false;
 let buttonLocked = false;
 let sleepCooldown = false;
 
@@ -35,7 +34,7 @@ function delayedAction(action, buttonId, ms = 1000000) {
   sleepCooldown = true;
 
   setTimeout(() => {
-    action();        // vykoná funkciu po ms
+    action();
     render();
 
     sleepCooldown = false;
@@ -45,9 +44,26 @@ function delayedAction(action, buttonId, ms = 1000000) {
   }, ms);
 }
 
+function disableButtons() {
+  const allButtons = document.querySelectorAll('#controls button');
+    allButtons.forEach(b => b.disabled = true);
+  }
+  function enableButtons() {
+  const allButtons = document.querySelectorAll('#controls button');
+    allButtons.forEach(b => b.disabled = false);
+  }
+
+
 function updateSleepButton() {
   const btn = document.getElementById('sleepBtn');
   if (!btn) return;
+
+
+   if (!gameIsRunning || actionInProgress || hunger < 6 || cleaness < 6) {
+    btn.disabled = true;
+    return;
+  }
+
 
   if (!sleepCooldown && timeOfDay > 20) {
     btn.disabled = false;
@@ -84,23 +100,18 @@ setInterval(() => {
 
 /* -------------------------------------- */
 
-function lowerStats() {
-  decreaseHunger();
-  decreaseHapiness();
-  decreaseCleaness();
-  decreaseEnergy();
-  render();
-}
-
 function feed() {
   if (!gameIsRunning) return;
+   actionInProgress = true;
   hunger += 3;
   energy += 1;
 }
 
-/* KÚPEĽ – animácia + čistenie */
 function wash() {
   if (!gameIsRunning) return;
+  actionInProgress = true;
+
+ disableButtons()
 
   happiness += 3;
   cleaness += 5;
@@ -114,22 +125,32 @@ function wash() {
       bubbles.style.opacity = 0;
       updateDirtVisual();
       render();
-    }, 1500);
+
+      if (gameIsRunning) {
+        enableButtons();
+        updateSleepButton();
+      }
+    }, 5000);
   } else {
     updateDirtVisual();
     render();
+    
   }
 }
 
 function sleep() {
   if (!gameIsRunning) return;
-  energy = 30;
+  actionInProgress = true;
+  hunger -= 5;
+  cleaness -=5;
+  energy += 20;
   dayNumber += 1;
   timeOfDay = 8;
 }
 
 function play() {
   if (!gameIsRunning) return;
+   actionInProgress = true;
   delayedAction(() => {
     buttonLocked = true;
     happiness += 5;
@@ -150,32 +171,27 @@ function gameOver() {
     message = "Tvoj kamarat zomrel na chorobu";
   }
   if (happiness <= 0) {
-    message = "Tvoj kamarat spachal sebevrazdu";
+    message = "Tvoj kamarat zomrel od smutku";
   }
 
   if (message !== "") {
     document.getElementById("game-over-message").textContent = message;
     gameIsRunning = false;
+    disableButtons();
   }
 }
 
 function decreaseHunger() {
   if (!gameIsRunning) return;
-  if (hunger > 0) {
-    hunger -= 1;
-  }
+  if (hunger > 0) hunger -= 1;
   render();
   gameOver();
 }
 setInterval(decreaseHunger, 5000);
 
-
-
 function decreaseHapiness() {
   if (!gameIsRunning) return;
-  if (happiness > 0) {
-    happiness -= 1;
-  }
+  if (happiness > 0) happiness -= 1;
   render();
   gameOver();
 }
@@ -183,9 +199,7 @@ setInterval(decreaseHapiness, 6000);
 
 function decreaseEnergy() {
   if (!gameIsRunning) return;
-  if (energy > 0) {
-    energy -= 1;
-  }
+  if (energy > 0) energy -= 1;
   render();
   gameOver();
 }
@@ -219,7 +233,6 @@ function updateTime() {
 }
 setInterval(updateTime, 200);
 
-/* inicializácia */
 render();
-// enableSleep(); // už nevoláme, neexistuje
 updateDirtVisual();
+updateSleepButton();
