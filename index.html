@@ -4,21 +4,20 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Virtuálny kamarát — kuchyňa</title>
-  <!-- Dizajn a animácie -->
   <link rel="stylesheet" href="dizajn.css">
-  <link rel="stylesheet" href="animation.css">
+   <link rel="stylesheet" href="animation.css">
 </head>
 <body>
   
   <header>
-    <h1>Čuník Džigino</h1>
+    <h1>Virtuálny kamarát</h1>
     <p id="game-version" aria-hidden="true">verzia 0.1 (kuchyňa)</p>
-  </header> 
+  </header>
 
   <main>
     <!-- HUD / status -->
     <section id="status" aria-label="Stav kamaráta">
-      <p>Cleaness: <span id="cleaness">--</span></p>
+      <p>Čistota: <span id="cleaness">--</span></p>
       <p>Hlad: <span id="hunger">--</span></p>
       <p>Radosť: <span id="happiness">--</span></p>
       <p>Energia: <span id="energy">--</span></p>
@@ -26,31 +25,36 @@
 
     <!-- Hlavná plocha hry -->
     <section id="game-area" aria-label="Herná plocha">
-      <div id="game-over-message"></div>
-
+      <div id="game-over-message" style="color:red; font-weight:bold;"></div>
+      
+      <!-- Kuchynská linka -->
+      <div id="counter"></div>
+      <!-- Rúra -->
+      <div id="oven"></div>
+      <!-- Drez -->
+      <div id="sink"></div>
+      <!-- Okno -->
+      <div id="window"></div>
+      
       <!-- Miesto pre postavičku -->
       <div id="pet-container" role="img" aria-label="Vizuálny reprezentant kamaráta"></div>
 
       <!-- Prasiatko -->
-      <div id="pig">
-        <div class="pig-body"></div>
-        <div class="pig-head">
-          <div class="pig-ear left"></div>
-          <div class="pig-ear right"></div>
-          <div class="pig-eye left"></div>
-          <div class="pig-eye right"></div>
-          <div class="pig-pupil left"></div>
-          <div class="pig-pupil right"></div>
-          <div class="pig-nose"></div>
-        </div>
+<!-- Prasiatko -->
+<div id="pig">
+  <div class="pig-body"></div>
+  <div class="pig-head">
+    <div class="pig-ear left"></div>
+    <div class="pig-ear right"></div>
+    <div class="pig-eye left"></div>
+    <div class="pig-eye right"></div>
+    <div class="pig-nose"></div>
+  </div>
 
-        <!-- FEED ANIMÁCIA NAD PRASIATKOM -->
-        <div id="feed-animation"></div>
-
-        <!-- Špina + animácia kúpeľa -->
-        <div id="dirt-layer"></div>
-        <div id="bath-animation"></div>
-      </div>
+  <!-- Špina + animácia kúpeľa -->
+  <div id="dirt-layer"></div>
+  <div id="bath-animation"></div>
+</div>
 
       <!-- stavové hlášky / udalosti -->
       <div id="feed-notification" aria-live="polite"></div>
@@ -58,15 +62,18 @@
 
     <!-- Ovládacie prvky -->
     <section id="controls" aria-label="Ovládanie">
-      
+      <h2>Ovládanie</h2>
       <div class="control">
-        <button id="feedBtn" type="button" data-action="feed" onclick="feedAnimation(); delayedAction(feed, 'feedBtn', 5000)">Nakŕmiť</button>
+        <button id="feedBtn" type="button" data-action="feed" onclick="delayedAction(feed, 'feedBtn' , 5000)">Nakŕmiť</button>
         <button id="playBtn" type="button" data-action="play" onclick="play()">Hrať sa</button>
         <button id="sleepBtn" type="button" data-action="sleep" onclick="delayedAction(sleep, 'sleepBtn', 10000 )">Poslať spať</button>
         <button id="washBtn" type="button" data-action="clean" onclick="wash()">Umyť</button>
       </div>
 
-      
+      <div id="inventory" aria-label="Inventár">
+        <h3>Inventár</h3>
+        <ul></ul>
+      </div>
     </section>
 
     <!-- Informácie o dennom cykle / čas -->
