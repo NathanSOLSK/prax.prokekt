@@ -1,10 +1,10 @@
-let cleaness = 30;
-let hunger = 50;
-let happiness = 50;
-let energy = 30;
+let cleaness = 200;
+let hunger = 500;
+let happiness = 500;
+let energy = 300;
 
 let dayNumber = 0;
-let timeOfDay = 19;
+let timeOfDay = 5;
 
 let speed = 0.01;
 
@@ -65,7 +65,7 @@ function updateSleepButton() {
   }
 
 
-  if (!sleepCooldown && timeOfDay > 20) {
+  if (!sleepCooldown && timeOfDay > 20 || timeOfDay < 6) {
     btn.disabled = false;
   } else {
     btn.disabled = true;
@@ -102,9 +102,20 @@ setInterval(() => {
 
 function feed() {
   if (!gameIsRunning) return;
-   actionInProgress = true;
   hunger += 3;
   energy += 1;
+
+  // prehratie animácie kŕmenia
+  const feedAnim = document.getElementById("feed-animation");
+  if (feedAnim) {
+    feedAnim.textContent = "🍎";  // môžeš zmeniť na 🍗, 🍔, 🥕 atď.
+    feedAnim.classList.remove("feed-show");
+
+    // reset animácie (reflow trik)
+    void feedAnim.offsetWidth;
+
+    feedAnim.classList.add("feed-show");
+  }
 }
 
 function wash() {
@@ -231,7 +242,32 @@ function updateTime() {
 
   document.getElementById("time-of-day").textContent = formattedTime;
 }
-setInterval(updateTime, 200);
+setInterval(() => {
+  updateTime();
+  updateNightMode();
+}, 200);
+
+function updateNightMode() {
+  const isNight = timeOfDay >= 20 || timeOfDay < 6;
+
+  const body = document.body;
+  const gameArea = document.getElementById("game-area");
+  const pig = document.getElementById("pig");
+  const windowGlow = document.getElementById("window");
+
+  if (isNight) {
+    body.classList.add("night-mode");
+    gameArea.classList.add("night");
+    pig.classList.add("night");
+    windowGlow.classList.add("night-glow");
+  } else {
+    body.classList.remove("night-mode");
+    gameArea.classList.remove("night");
+    pig.classList.remove("night");
+    windowGlow.classList.remove("night-glow");
+  }
+}
+
 
 render();
 updateDirtVisual();
