@@ -1,10 +1,10 @@
-let cleaness = 30;
-let hunger = 50;
-let happiness = 50;
-let energy = 30;
+let cleaness = 46;
+let hunger = 500;
+let happiness = 500;
+let energy = 15;
 
 let dayNumber = 0;
-let timeOfDay = 19;
+let timeOfDay = 8;
 
 let speed = 0.01;
 
@@ -65,27 +65,79 @@ function updateSleepButton() {
   }
 
 
-  if (!sleepCooldown && timeOfDay > 20) {
+  if (!sleepCooldown && (timeOfDay > 20 || timeOfDay < 6) ||  energy < 15) {
     btn.disabled = false;
-  } else {
+} else {
     btn.disabled = true;
-  }
+}
 }
 setInterval(updateSleepButton, 100);
+
+/* ===============================
+           FUNKCIE ANIMACII
+   =============================== */
+
+
+
+/* ----------ZMURKANIE---------- */
+
+function blinkPig() {
+  const eyes = document.querySelectorAll(".pig-eye");
+  const pupils = document.querySelectorAll(".pig-pupil");
+
+  // pridaj triedu
+  eyes.forEach(e => e.classList.add("blinking"));
+  pupils.forEach(p => p.classList.add("blinking"));
+
+  // odstráň po 200ms
+  setTimeout(() => {
+    eyes.forEach(e => e.classList.remove("blinking"));
+    pupils.forEach(p => p.classList.remove("blinking"));
+  }, 200);
+}
+
+// prasiatko žmurkne každé 3 – 6 sekúnd
+setInterval(() => {
+  if (!gameIsRunning) return;
+  const randomTime = 3000 + Math.random() * 3000;
+  setTimeout(blinkPig, randomTime);
+}, 3500);
+
+
+/* --------- KRUHY POD OCAMI --------- */
+function updateTiredEyes() {
+  const eyes = document.querySelectorAll(".pig-eye");
+
+  if (energy < 15) {
+    eyes.forEach(e => e.classList.add("tired"));
+  } else {
+    eyes.forEach(e => e.classList.remove("tired"));
+  }
+}
+setInterval(updateTiredEyes, 0);
+
+
+
+
+
+
+
 
 /* --------- ŠPINA NA PRASIATKU --------- */
 
 function updateDirtVisual() {
-  const dirt = document.getElementById("dirt-layer");
-  if (!dirt) return;
+  let dirtOpacity;
 
-  if (cleaness > 45) dirt.style.opacity = 0;
-  else if (cleaness > 35) dirt.style.opacity = 0.2;
-  else if (cleaness > 25) dirt.style.opacity = 0.4;
-  else if (cleaness > 15) dirt.style.opacity = 0.6;
-  else if (cleaness > 5) dirt.style.opacity = 0.8;
-  else dirt.style.opacity = 1;
+  if (cleaness > 45) dirtOpacity = 0;
+  else if (cleaness > 35) dirtOpacity = 0.2;
+  else if (cleaness > 25) dirtOpacity = 0.4;
+  else if (cleaness > 15) dirtOpacity = 0.6;
+  else if (cleaness > 5) dirtOpacity = 0.8;
+  else dirtOpacity = 1;
+
+  document.documentElement.style.setProperty('--dirtOpacity', dirtOpacity);
 }
+
 
 // postupné špinenie
 setInterval(() => {
@@ -100,11 +152,26 @@ setInterval(() => {
 
 /* -------------------------------------- */
 
+
+function feedAnimation() {
+  const feedAnim = document.getElementById("feed-animation");
+  if (feedAnim) {
+    feedAnim.textContent = "🍎";
+    feedAnim.classList.remove("feed-show");
+    void feedAnim.offsetWidth;
+    feedAnim.classList.add("feed-show");
+  }
+}
+
 function feed() {
   if (!gameIsRunning) return;
-   actionInProgress = true;
+
+  actionInProgress = true;
+  disableButtons();
+
   hunger += 3;
   energy += 1;
+  
 }
 
 function wash() {
@@ -231,8 +298,35 @@ function updateTime() {
 
   document.getElementById("time-of-day").textContent = formattedTime;
 }
-setInterval(updateTime, 200);
+setInterval(() => {
+  updateTime();
+  updateNightMode();
+
+}, 200);
+
+function updateNightMode() {
+  const isNight = timeOfDay >= 20 || timeOfDay < 6;
+
+  const body = document.body;
+  const gameArea = document.getElementById("game-area");
+  const pig = document.getElementById("pig");
+  const windowGlow = document.getElementById("window");
+
+  if (isNight) {
+    body.classList.add("night-mode");
+    gameArea.classList.add("night");
+    pig.classList.add("night");
+    windowGlow.classList.add("night-glow");
+  } else {
+    body.classList.remove("night-mode");
+    gameArea.classList.remove("night");
+    pig.classList.remove("night");
+    windowGlow.classList.remove("night-glow");
+  }
+}
+
 
 render();
 updateDirtVisual();
 updateSleepButton();
+updateTiredEyes();
