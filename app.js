@@ -65,7 +65,7 @@ function updateSleepButton() {
   }
 
 
-  if (!sleepCooldown && (timeOfDay > 20 || timeOfDay < 6) ||  energy < 15) {
+  if (!sleepCooldown && timeOfDay > 20 || timeOfDay < 6 ||  energy < 15) {
     btn.disabled = false;
 } else {
     btn.disabled = true;
@@ -116,13 +116,6 @@ function updateTiredEyes() {
 }
 setInterval(updateTiredEyes, 0);
 
-
-
-
-
-
-
-
 /* --------- ŠPINA NA PRASIATKU --------- */
 
 function updateDirtVisual() {
@@ -150,8 +143,6 @@ setInterval(() => {
   render();
 }, 7000);
 
-/* -------------------------------------- */
-
 
 function feedAnimation() {
   const feedAnim = document.getElementById("feed-animation");
@@ -162,6 +153,12 @@ function feedAnimation() {
     feedAnim.classList.add("feed-show");
   }
 }
+
+/* -------------------------------------- */
+/* -------------------------------------- */
+/* -------------------------------------- */
+
+
 
 function feed() {
   if (!gameIsRunning) return;
@@ -324,6 +321,9 @@ function updateNightMode() {
     windowGlow.classList.remove("night-glow");
   }
 }
+
+
+
 
 
 render();
