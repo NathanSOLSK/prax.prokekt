@@ -45,6 +45,31 @@ main {
   background-size: contain;
   box-shadow: 0 4px 15px rgba(0,0,0,0.3);
   overflow: visible;
+  transition: background 0.5s ease-in-out;
+}
+
+/* Trieda pre spálňu */
+#game-area.bedroom {
+  background: url('https://cdn.discordapp.com/attachments/1230846790136234026/1440732557380419774/4587.png?ex=691f3a41&is=691de8c1&hm=3b785a942faf55a7283684cbef4bbf3cbeb3664e320233bf64fdaf5e6cc3a1aa&') no-repeat center bottom;
+  /* Force the game area to the intended size for bedroom view */
+  width: 600px;
+  height: 350px;
+  background-size: 600px 350px; /* ensure background image matches exact size */
+  background-repeat: no-repeat;
+}
+
+/* If you use an <img> inside the bedroom container, force its size too */
+#game-area.bedroom img {
+  width: 600px;
+  height: 350px;
+  object-fit: cover;
+  display: block;
+}
+
+/* Trieda pre návrat do kuchyne */
+#game-area.kitchen {
+  background: url('https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse1.mm.bing.net%2Fth%2Fid%2FOIP.yQLVGhLSuAfi-7jdwDq3UQHaHa%3Fpid%3DApi%26ucfimg%3D1&f=1&ipt=3217eb0f7b487e8212d69960f66edf02095bc21e6ce48a4e01bc6c20bfec9ccd&ipo=images') no-repeat center bottom;
+  background-size: contain;
 }
 
 /* ---------- Postavička ---------- */
@@ -65,7 +90,7 @@ main {
   left: 250px;
   width: 120px;
   height: 140px;
-  z-index: 15px
+  z-index: 15;
 }
 
 .pig-body {
@@ -239,7 +264,5 @@ main {
   transform: translateX(-50%);
   z-index: -1;
 }
-
-
 
 

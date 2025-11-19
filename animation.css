@@ -121,5 +121,46 @@
   }
 }
 
+/* ---------- Spánok / ľahnutie na posteli (iba v spálni) ---------- */
+@keyframes lieDown {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate(-30px, 10px) rotate(-30deg);
+  }
+  100% {
+    transform: translate(-70px, 40px) rotate(-90deg);
+  }
+}
+
+@keyframes breathe {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.995); }
+  100% { transform: scale(1); }
+}
+
+/* When bedroom background is active and pig has .sleeping, animate lie-down */
+#game-area.bedroom #pig.sleeping {
+  animation: lieDown 1s ease-out forwards, breathe 3s ease-in-out 1s infinite;
+  transform-origin: center center;
+  z-index: 10;
+}
+
+/* Make eyes appear closed and hide pupils while sleeping */
+#game-area.bedroom #pig.sleeping .pig-eye {
+  height: 4px;
+  transition: height 200ms ease;
+}
+
+#game-area.bedroom #pig.sleeping .pig-pupil {
+  opacity: 0;
+}
+
+/* Slight visual fade to indicate sleeping state */
+#game-area.bedroom #pig.sleeping {
+  filter: brightness(0.95);
+}
+
 
 

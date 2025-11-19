@@ -3,8 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Virtuálny kamarát — kuchyňa</title>
-  <!-- Dizajn a animácie -->
+  <title>Virtuálny kamarát — kuchyňa/spálňa</title>
   <link rel="stylesheet" href="dizajn.css">
   <link rel="stylesheet" href="animation.css">
 </head>
@@ -12,11 +11,11 @@
   
   <header>
     <h1>Čuník Džigino</h1>
-    <p id="game-version" aria-hidden="true">verzia 0.1 (kuchyňa)</p>
+    <p id="game-version" aria-hidden="true">verzia 0.1</p>
   </header> 
 
   <main>
-    <!-- HUD / status -->
+    <!-- HUD -->
     <section id="status" aria-label="Stav kamaráta">
       <p>Čistota: <span id="cleaness">--</span></p>
       <p>Hlad: <span id="hunger">--</span></p>
@@ -24,12 +23,9 @@
       <p>Energia: <span id="energy">--</span></p>
     </section>
 
-    <!-- Hlavná plocha hry -->
+    <!-- Herná plocha -->
     <section id="game-area" aria-label="Herná plocha">
       <div id="game-over-message"></div>
-
-      <!-- Miesto pre postavičku -->
-      <div id="pet-container" role="img" aria-label="Vizuálny reprezentant kamaráta"></div>
 
       <!-- Prasiatko -->
       <div id="pig">
@@ -44,32 +40,27 @@
           <div class="pig-nose"></div>
         </div>
 
-        <!-- FEED ANIMÁCIA NAD PRASIATKOM -->
         <div id="feed-animation"></div>
-
-        <!-- Špina + animácia kúpeľa -->
         <div id="dirt-layer"></div>
         <div id="bath-animation"></div>
       </div>
 
-      <!-- stavové hlášky / udalosti -->
       <div id="feed-notification" aria-live="polite"></div>
     </section>
 
     <!-- Ovládacie prvky -->
     <section id="controls" aria-label="Ovládanie">
-      
       <div class="control">
         <button id="feedBtn" type="button" data-action="feed" onclick="feedAnimation(); delayedAction(feed, 'feedBtn', 5000)">Nakŕmiť</button>
         <button id="playBtn" type="button" data-action="play" onclick="play()">Hrať sa</button>
-        <button id="sleepBtn" type="button" data-action="sleep" onclick="delayedAction(sleep, 'sleepBtn', 10000 )">Poslať spať</button>
+        <button id="sleepBtn" type="button" data-action="sleep" onclick="delayedAction(sleep, 'sleepBtn', 10000)">Poslať spať</button>
         <button id="washBtn" type="button" data-action="clean" onclick="wash()">Umyť</button>
+        <button id="bedroomBtn" type="button" onclick="goToBedroom()">Spálňa</button>
+        <button id="kitchenBtn" type="button" onclick="goToKitchen()">Kuchyňa</button>
       </div>
-
-      
     </section>
 
-    <!-- Informácie o dennom cykle / čas -->
+    <!-- Denný cyklus -->
     <section id="day-cycle" aria-label="Denný cyklus">
       <p>Deň: <span id="day-number">--</span></p>
       <p>Čas: <span id="time-of-day">--</span></p>
@@ -82,7 +73,7 @@
   </aside>
 
   <footer>
-    <p>&copy; 2025 Tvoje meno — projekt: Virtuálny kamarát (kuchyňa)</p>
+    <p>&copy; 2025 Tvoje meno — Virtuálny kamarát</p>
   </footer>
 
   <!-- JavaScript -->
