@@ -21,10 +21,13 @@
       <p>Hlad: <span id="hunger">--</span></p>
       <p>Radosť: <span id="happiness">--</span></p>
       <p>Energia: <span id="energy">--</span></p>
+      <p>Sfajčenosť: <span id="smoking">--</span></p>
+      <p>Peniaze: <span id="money">0</span> €</p>
     </section>
 
     <!-- Herná plocha -->
     <section id="game-area" aria-label="Herná plocha">
+      <div id="mine-animation" aria-hidden="true"></div>
       <div id="game-over-message"></div>
 
       <!-- Prasiatko -->
@@ -43,6 +46,7 @@
         <div id="feed-animation"></div>
         <div id="dirt-layer"></div>
         <div id="bath-animation"></div>
+        <div id="smoke-effect" aria-hidden="true"></div>
       </div>
 
       <div id="feed-notification" aria-live="polite"></div>
@@ -52,13 +56,37 @@
     <section id="controls" aria-label="Ovládanie">
       <div class="control">
         <button id="feedBtn" type="button" data-action="feed" onclick="feedAnimation(); delayedAction(feed, 'feedBtn', 5000)">Nakŕmiť</button>
-        <button id="playBtn" type="button" data-action="play" onclick="play()">Hrať sa</button>
+        
         <button id="sleepBtn" type="button" data-action="sleep" onclick="delayedAction(sleep, 'sleepBtn', 10000)">Poslať spať</button>
         <button id="washBtn" type="button" data-action="clean" onclick="wash()">Umyť</button>
         <button id="bedroomBtn" type="button" onclick="goToBedroom()">Spálňa</button>
+        <button id="casinoBtn" type="button" onclick="goToCasino()">Kasíno</button>
+        <button id="mineBtn" type="button" onclick="goToMine()">Baňa</button>
+          <button id="mineWorkBtn" type="button" style="display:none" onclick="startMining()">Pracovať</button>
+        <button id="slotBtn" type="button" style="display:none" onclick="openSlots()">Sloty</button>
+        <button id="grassBtn" type="button" style="display:inline-block; margin-left:6px;" onclick="goToGrassStreet()">Trávnatá ulica</button>
+        <button id="grassUseBtn" type="button" style="display:none; margin-left:6px; background:#7bd389;" onclick="startSmoking()">Konzumovať trávu</button>
+        <button id="restartBtn" type="button" style="display:none; background:#ff6b6b; color:#fff;" onclick="restartGame()">Reštartovať</button>
         <button id="kitchenBtn" type="button" onclick="goToKitchen()">Kuchyňa</button>
       </div>
     </section>
+
+    <!-- Slot machine modal (hidden until opened) -->
+    <div id="slot-modal" class="slot-modal" role="dialog" aria-modal="true" style="display:none">
+      <div class="slot-content">
+        <button class="slot-close" onclick="closeSlots()" aria-label="Zatvoriť">✖</button>
+        <h2>Slot Machine</h2>
+        <div class="slot-reels">
+          <div class="slot-reel" id="reel1">?</div>
+          <div class="slot-reel" id="reel2">?</div>
+          <div class="slot-reel" id="reel3">?</div>
+        </div>
+        <div class="slot-controls">
+          <button id="spinBtn" class="spin-btn" onclick="spinSlots()">Spin</button>
+          <div id="slot-result" class="slot-result" aria-live="polite"></div>
+        </div>
+      </div>
+    </div>
 
     <!-- Denný cyklus -->
     <section id="day-cycle" aria-label="Denný cyklus">
