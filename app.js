@@ -369,13 +369,22 @@ function updateSmokedMode() {
 }
 setInterval(updateSmokedMode, 500);
 
-// Funkcie pre prechod medzi miestnosťami
-function goToBedroom() {
+// Helper function to fade room transition
+function fadeToRoom(roomClass) {
   const gameArea = document.getElementById('game-area');
   if (!gameArea) return;
-  // remove any other room classes and add bedroom
-  gameArea.classList.remove('kitchen', 'casino', 'mine', 'grass');
-  gameArea.classList.add('bedroom');
+  
+  gameArea.style.opacity = '0';
+  setTimeout(() => {
+    gameArea.classList.remove('kitchen', 'casino', 'mine', 'grass', 'bathroom', 'bedroom');
+    gameArea.classList.add(roomClass);
+    gameArea.style.opacity = '1';
+  }, 200);
+}
+
+// Funkcie pre prechod medzi miestnosťami
+function goToBedroom() {
+  fadeToRoom('bedroom');
   // hide mine work button when not in mine
   try { setMineButtonVisible(false); } catch (e) {}
   // hide slot button when leaving casino
@@ -392,11 +401,7 @@ function goToBedroom() {
 }
 
 function goToKitchen() {
-  const gameArea = document.getElementById('game-area');
-  if (!gameArea) return;
-  // remove any other room classes and add kitchen
-  gameArea.classList.remove('bedroom', 'casino', 'mine', 'grass');
-  gameArea.classList.add('kitchen');
+  fadeToRoom('kitchen');
   try { setMineButtonVisible(false); } catch (e) {}
   // hide slot button when leaving casino
   try { setCasinoButtonVisible(false); } catch (e) {}
@@ -412,11 +417,7 @@ function goToKitchen() {
 }
 
 function goToCasino() {
-  const gameArea = document.getElementById('game-area');
-  if (!gameArea) return;
-  // remove other room classes and add casino
-  gameArea.classList.remove('bedroom', 'kitchen', 'mine', 'grass');
-  gameArea.classList.add('casino');
+  fadeToRoom('casino');
 
   try { setMineButtonVisible(false); } catch (e) {}
 
@@ -436,11 +437,7 @@ function goToCasino() {
 }
 
 function goToMine() {
-  const gameArea = document.getElementById('game-area');
-  if (!gameArea) return;
-  // clear other room classes and add mine
-  gameArea.classList.remove('bedroom', 'kitchen', 'casino', 'grass');
-  gameArea.classList.add('mine');
+  fadeToRoom('mine');
   // show the mine work button when in the mine
   try { setMineButtonVisible(true); } catch (e) {}
   // hide slot button when leaving casino
@@ -459,11 +456,7 @@ function goToMine() {
 }
 
 function goToBathroom() {
-  const gameArea = document.getElementById('game-area');
-  if (!gameArea) return;
-  // remove any other room classes and add bathroom
-  gameArea.classList.remove('bedroom', 'kitchen', 'casino', 'mine', 'grass');
-  gameArea.classList.add('bathroom');
+  fadeToRoom('bathroom');
   // hide mine/slot/grass controls when in bathroom
   try { setMineButtonVisible(false); } catch (e) {}
   try { setCasinoButtonVisible(false); } catch (e) {}
@@ -521,11 +514,7 @@ function smokeGrass() {
 }
 
 function goToGrassStreet() {
-  const gameArea = document.getElementById('game-area');
-  if (!gameArea) return;
-  // clear other room classes and add grass street
-  gameArea.classList.remove('bedroom', 'kitchen', 'casino', 'mine');
-  gameArea.classList.add('grass');
+  fadeToRoom('grass');
 
   // hide mine and slot buttons in this area
   try { setMineButtonVisible(false); } catch (e) {}
