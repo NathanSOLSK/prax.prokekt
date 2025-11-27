@@ -1,8 +1,21 @@
-let cleaness = 100, hunger = 100, happiness = 100, energy = 100, smoking = 10;
+let cleaness = 100, hunger = 100, happiness = 100, energy = 10, smoking = 20;
 let money = 0;
-let dayNumber = 0, timeOfDay = 8;
+let dayNumber = 0, timeOfDay = 20;
 let speed = 0.01;
 let gameIsRunning = true, actionInProgress = false, buttonLocked = false, sleepCooldown = false;
+
+// State version: bump this when you change default initial stats
+const STATE_VERSION = 1;
+// Keys that should always use the current code default instead of a saved value
+const DEFAULT_OVERRIDE_KEYS = ['timeOfDay'];
+
+// Small DOM helpers to reduce repetition
+const $ = (id) => document.getElementById(id);
+const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+const setText = (id, value) => { const el = $(id); if (el) el.textContent = value; };
+const show = (id) => { const el = $(id); if (el && el.style) el.style.display = 'inline-block'; };
+const hide = (id) => { const el = $(id); if (el && el.style) el.style.display = 'none'; };
+const controlButtons = () => $$('#controls button');
 
 // Persist/load minimal game state to localStorage
 function saveState() {
@@ -11,7 +24,7 @@ function saveState() {
     const rooms = ['bedroom','kitchen','casino','mine','grass'];
     let room = null;
     if (gameArea) for (const r of rooms) if (gameArea.classList.contains(r)) { room = r; break; }
-    const state = { cleaness, hunger, happiness, energy, smoking, money, dayNumber, timeOfDay, room };
+    const state = { cleaness, hunger, happiness, energy, smoking, money, dayNumber, timeOfDay, room, version: STATE_VERSION };
     localStorage.setItem('vk_game_state', JSON.stringify(state));
   } catch (e) { console.warn('saveState failed', e); }
 }
@@ -22,6 +35,13 @@ function loadState() {
     if (!raw) return;
     const s = JSON.parse(raw);
     if (s && typeof s === 'object') {
+      // If saved state version doesn't match current version, ignore saved state
+      const savedVersion = (typeof s.version === 'number') ? s.version : 0;
+      if (savedVersion !== STATE_VERSION) {
+        console.info('Saved game state version', savedVersion, 'does not match current', STATE_VERSION, '- ignoring saved state.');
+        try { localStorage.removeItem('vk_game_state'); } catch (e) {}
+        return;
+      }
       if (typeof s.cleaness === 'number') cleaness = s.cleaness;
       if (typeof s.hunger === 'number') hunger = s.hunger;
       if (typeof s.happiness === 'number') happiness = s.happiness;
@@ -29,7 +49,7 @@ function loadState() {
       if (typeof s.smoking === 'number') smoking = s.smoking;
       if (typeof s.money === 'number') money = s.money;
       if (typeof s.dayNumber === 'number') dayNumber = s.dayNumber;
-      if (typeof s.timeOfDay === 'number') timeOfDay = s.timeOfDay;
+      if (typeof s.timeOfDay === 'number' && !DEFAULT_OVERRIDE_KEYS.includes('timeOfDay')) timeOfDay = s.timeOfDay;
       if (s.room) {
         const gameArea = document.getElementById('game-area');
         if (gameArea) {
@@ -49,13 +69,13 @@ function render() {
   energy = Math.max(0, Math.min(100, energy));
   smoking = Math.max(0, Math.min(100, smoking));
 
-  document.getElementById("cleaness").textContent = cleaness;
-  document.getElementById("hunger").textContent = hunger;
-  document.getElementById("happiness").textContent = happiness;
-  document.getElementById("energy").textContent = energy;
-  const smokeEl = document.getElementById('smoking'); if (smokeEl) smokeEl.textContent = smoking;
-  const moneyEl = document.getElementById('money'); if (moneyEl) moneyEl.textContent = money;
-  document.getElementById("day-number").textContent = dayNumber;
+  setText('cleaness', cleaness);
+  setText('hunger', hunger);
+  setText('happiness', happiness);
+  setText('energy', energy);
+  setText('smoking', smoking);
+  setText('money', money);
+  setText('day-number', dayNumber);
   // check for game over after each render
   gameOver();
   // persist state after render so progress isn't lost
@@ -66,12 +86,10 @@ function delayedAction(action, buttonId, ms = 500) {
   if (buttonLocked) return;
   buttonLocked = true;
 
-  const btn = document.getElementById(buttonId);
-  const allButtons = document.querySelectorAll('#controls button');
-  // disable UI while waiting
+  const btn = $(buttonId);
+  const allButtons = controlButtons();
   allButtons.forEach(b => b.disabled = true);
 
-  // if target button doesn't exist, restore state and exit
   if (!btn) {
     buttonLocked = false;
     allButtons.forEach(b => b.disabled = false);
@@ -81,12 +99,11 @@ function delayedAction(action, buttonId, ms = 500) {
   sleepCooldown = true;
 
   if (buttonId === 'sleepBtn') {
-    const pig = document.getElementById('pig');
-    if (pig) {
+    const pig = $('pig');
+    if (pig && pig.style) {
       pig.style.setProperty('--sleep-duration', ms + 'ms');
       pig.classList.add('sleeping');
       actionInProgress = true;
-      // keep sleeping class until wait + lie-down completes (800ms default)
       setTimeout(() => {
         pig.classList.remove('sleeping');
         actionInProgress = false;
@@ -105,23 +122,36 @@ function delayedAction(action, buttonId, ms = 500) {
 }
 
 // Tlačidlá
-function disableButtons() { document.querySelectorAll('#controls button').forEach(b => b.disabled = true); }
-function enableButtons() { document.querySelectorAll('#controls button').forEach(b => b.disabled = false); }
+function disableButtons() { controlButtons().forEach(b => b.disabled = true); }
+function enableButtons() { controlButtons().forEach(b => b.disabled = false); }
+
+// Enable/disable wash button depending on whether player is in the bathroom
+function updateWashButton() {
+  const btn = $('washBtn');
+  const gameArea = $('game-area');
+  if (!btn) return;
+  btn.disabled = !(gameArea && gameArea.classList.contains('bathroom'));
+}
 
 function updateSleepButton() {
-  const btn = document.getElementById('sleepBtn');
+  const btn = $('sleepBtn');
   if (!btn) return;
-  const gameArea = document.getElementById('game-area');
+  const gameArea = $('game-area');
   const inBedroom = gameArea && gameArea.classList.contains('bedroom');
-  btn.disabled = !gameIsRunning || actionInProgress || hunger < 6 || cleaness < 6 || !inBedroom || (sleepCooldown && energy >= 100);
+  const isNight = timeOfDay >= 20 || timeOfDay < 6;
+  const allowedToSleep = inBedroom && (energy < 20 || isNight);
+  btn.disabled = !gameIsRunning || actionInProgress || hunger < 6 || cleaness < 6 || !allowedToSleep || (sleepCooldown && energy >= 100);
 }
 
 setInterval(updateSleepButton, 100);
 
 // Žmurkanie
 function blinkPig() {
-  const eyes = document.querySelectorAll(".pig-eye");
-  const pupils = document.querySelectorAll(".pig-pupil");
+  const pig = $('pig');
+  // don't blink while sleeping
+  if (pig && pig.classList.contains('sleeping')) return;
+  const eyes = $$(".pig-eye");
+  const pupils = $$(".pig-pupil");
   eyes.forEach(e => e.classList.add("blinking"));
   pupils.forEach(p => p.classList.add("blinking"));
   setTimeout(() => { eyes.forEach(e => e.classList.remove("blinking")); pupils.forEach(p => p.classList.remove("blinking")); }, 200);
@@ -134,10 +164,16 @@ setInterval(() => {
 
 // Kruhy pod očami
 function updateTiredEyes() {
-  const eyes = document.querySelectorAll(".pig-eye");
-  eyes.forEach(e => e.classList.toggle("tired", energy < 15));
+  const eyes = $$(".pig-eye");
+  eyes.forEach(e => e.classList.toggle("tired", energy < 20));
 }
 setInterval(updateTiredEyes, 500);
+
+function updateSmokedEyes() {
+  const eyes = $$(".pig-eye");
+  eyes.forEach(e => e.classList.toggle("sfetovane", smoking > 40));
+}
+setInterval(updateSmokedEyes, 500);
 
 // Špina
 function updateDirtVisual() {
@@ -155,17 +191,50 @@ setInterval(() => { if(!gameIsRunning) return; cleaness = Math.max(0, cleaness-1
 function feedAnimation() { const feedAnim = document.getElementById("feed-animation"); if(feedAnim){ feedAnim.textContent="🍎"; feedAnim.classList.remove("feed-show"); void feedAnim.offsetWidth; feedAnim.classList.add("feed-show"); } }
 function feed() { hunger = Math.min(100, hunger+3); energy = Math.min(100, energy+1); render(); }
 function play() { happiness = Math.min(100, happiness+5); energy = Math.max(0, energy-3); render(); }
-function wash() { cleaness = Math.min(100, cleaness+5); happiness = Math.min(100,happiness+3); const bubbles = document.getElementById("bath-animation"); if(bubbles){ bubbles.style.opacity=1; setTimeout(()=>{bubbles.style.opacity=0; updateDirtVisual(); render(); enableButtons();},5000);} else {updateDirtVisual(); render();} }
+// Only allow washing when in the bathroom. Show a short notification otherwise.
+function wash() {
+  const gameArea = document.getElementById('game-area');
+  const note = document.getElementById('feed-notification');
+  if (!gameArea || !gameArea.classList.contains('bathroom')) {
+    if (note) {
+      note.textContent = 'Kúpať sa dá iba v kúpeľni.';
+      setTimeout(() => { note.textContent = ''; }, 1400);
+    }
+    return;
+  }
+
+  cleaness = Math.min(100, cleaness+5);
+  happiness = Math.min(100, happiness+3);
+  const bubbles = document.getElementById('bath-animation');
+  if (bubbles) {
+    bubbles.style.opacity = 1;
+    bubbles.classList.add('show');
+    setTimeout(() => { bubbles.style.opacity = 0; bubbles.classList.remove('show'); }, 1800);
+  }
+  render();
+
+}
 
 // Spánok
 function sleep() {
   if (!gameIsRunning) return;
-  const gameArea = document.getElementById('game-area');
+  const gameArea = $('game-area');
+  const isNight = timeOfDay >= 20 || timeOfDay < 6;
   if (!gameArea || !gameArea.classList.contains('bedroom')) {
-    const note = document.getElementById('feed-notification');
+    const note = $('feed-notification');
     if (note) {
       note.textContent = "Môžeš spať len v spálni.";
       setTimeout(() => { note.textContent = ""; }, 2500);
+    }
+    return;
+  }
+
+  // Require either low energy or night time to sleep
+  if (!(energy < 20 || isNight)) {
+    const note = $('feed-notification');
+    if (note) {
+      note.textContent = "Môžeš spať len keď si unavený (energia <20) alebo v noci.";
+      setTimeout(() => { note.textContent = ""; }, 2800);
     }
     return;
   }
@@ -202,7 +271,7 @@ function gameOver() {
     if (el) el.textContent = message;
     gameIsRunning = false;
     // disable all controls
-    try { document.querySelectorAll('#controls button').forEach(b => b.disabled = true); } catch (e) {}
+    try { controlButtons().forEach(b => b.disabled = true); } catch (e) {}
     // show restart button and enable it
     try {
       const rb = document.getElementById('restartBtn');
@@ -224,7 +293,7 @@ function restartGame() {
   try { localStorage.removeItem('vk_game_state'); } catch (e) {}
 
   // Reset core stats
-  cleaness = 100; hunger = 100; happiness = 100; energy = 100; smoking = 10; money = 0;
+  cleaness = 100; hunger = 100; happiness = 100; energy = 10; smoking = 30; money = 0;
   dayNumber = 0; timeOfDay = 8; gameIsRunning = true; actionInProgress = false; buttonLocked = false; sleepCooldown = false;
 
   // Close any open UI
@@ -249,7 +318,7 @@ function restartGame() {
   try { const el = document.getElementById('game-over-message'); if (el) el.textContent = ''; } catch (e) {}
 
   // Re-enable controls
-  try { document.querySelectorAll('#controls button').forEach(b => b.disabled = false); } catch (e) {}
+  try { controlButtons().forEach(b => b.disabled = false); } catch (e) {}
 
   // Render initial UI and save state
   render(); updateDirtVisual(); updateSleepButton(); updateTiredEyes();
@@ -279,6 +348,27 @@ function updateNightMode() {
   }
 }
 
+function updateSmokedMode() {
+  const isSmoked = smoking >= 50;
+  const body = document.body;
+  const gameArea = document.getElementById("game-area");
+  const pig = document.getElementById("pig");
+  const windowGlow = document.getElementById("window");
+
+  if (isSmoked) {
+    body.classList.add("smoked-mode");
+    if (gameArea) gameArea.classList.add("smoked");
+    if (pig) pig.classList.add("smoked");
+    if (windowGlow) windowGlow.classList.add("smoked-glow");
+  } else {
+    body.classList.remove("smoked-mode");
+    if (gameArea) gameArea.classList.remove("smoked");
+    if (pig) pig.classList.remove("smoked");
+    if (windowGlow) windowGlow.classList.remove("smoked-glow");
+  }
+}
+setInterval(updateSmokedMode, 500);
+
 // Funkcie pre prechod medzi miestnosťami
 function goToBedroom() {
   const gameArea = document.getElementById('game-area');
@@ -298,6 +388,7 @@ function goToBedroom() {
     setTimeout(() => { note.textContent = ''; }, 1200);
   }
   updateSleepButton();
+  try { if (typeof updateWashButton === 'function') updateWashButton(); } catch (e) {}
 }
 
 function goToKitchen() {
@@ -317,6 +408,7 @@ function goToKitchen() {
     setTimeout(() => { note.textContent = ''; }, 1200);
   }
   updateSleepButton();
+  try { if (typeof updateWashButton === 'function') updateWashButton(); } catch (e) {}
 }
 
 function goToCasino() {
@@ -340,6 +432,7 @@ function goToCasino() {
 
   // try to update UI state related to sleeping if function exists
   try { if (typeof updateSleepButton === 'function') updateSleepButton(); } catch (e) { console.warn('updateSleepButton missing', e); }
+  try { if (typeof updateWashButton === 'function') updateWashButton(); } catch (e) {}
 }
 
 function goToMine() {
@@ -362,6 +455,23 @@ function goToMine() {
   }
 
   try { if (typeof updateSleepButton === 'function') updateSleepButton(); } catch (e) { console.warn('updateSleepButton missing', e); }
+  try { if (typeof updateWashButton === 'function') updateWashButton(); } catch (e) {}
+}
+
+function goToBathroom() {
+  const gameArea = document.getElementById('game-area');
+  if (!gameArea) return;
+  // remove any other room classes and add bathroom
+  gameArea.classList.remove('bedroom', 'kitchen', 'casino', 'mine', 'grass');
+  gameArea.classList.add('bathroom');
+  // hide mine/slot/grass controls when in bathroom
+  try { setMineButtonVisible(false); } catch (e) {}
+  try { setCasinoButtonVisible(false); } catch (e) {}
+  try { setGrassButtonVisible(false); } catch (e) {}
+  const note = document.getElementById('feed-notification');
+  if (note) { note.textContent = ''; }
+  updateSleepButton();
+  try { if (typeof updateWashButton === 'function') updateWashButton(); } catch (e) {}
 }
 
 // show/hide grass-use button
@@ -373,10 +483,10 @@ function setGrassButtonVisible(visible) {
 
 // start smoking: add visual immediately and run delayed action
 function startSmoking() {
-  const pig = document.getElementById('pig');
+  const pig = $('pig');
   if (pig) pig.classList.add('smoking');
   // small smoke puffs: create a few puff elements so CSS animation runs when class added
-  const smokeContainer = document.getElementById('smoke-effect');
+  const smokeContainer = $('smoke-effect');
   if (smokeContainer) {
     smokeContainer.innerHTML = '';
     for (let i = 0; i < 3; i++) {
@@ -402,9 +512,9 @@ function smokeGrass() {
   if (note) { note.textContent = '+sfajčenosť +10, +radosť +3'; setTimeout(()=>{ note.textContent = ''; }, 1600); }
 
   // remove smoking visual class after a short fade
-  const pig = document.getElementById('pig');
+  const pig = $('pig');
   if (pig) pig.classList.remove('smoking');
-  const smokeContainer = document.getElementById('smoke-effect');
+  const smokeContainer = $('smoke-effect');
   if (smokeContainer) smokeContainer.innerHTML = '';
 
   render();
@@ -441,17 +551,17 @@ function setCasinoButtonVisible(visible) {
 
 // Slot machine UI control: open/close modal
 function openSlots() {
-  const modal = document.getElementById('slot-modal');
+  const modal = $('slot-modal');
   if (!modal) return;
   modal.style.display = 'flex';
   // initialize reels
-  const reels = [document.getElementById('reel1'), document.getElementById('reel2'), document.getElementById('reel3')];
+  const reels = [$('reel1'), $('reel2'), $('reel3')];
   reels.forEach(r => { if (r) r.textContent = '❓'; });
-  const result = document.getElementById('slot-result'); if (result) result.textContent = '';
+  const result = $('slot-result'); if (result) result.textContent = '';
 }
 
 function closeSlots() {
-  const modal = document.getElementById('slot-modal');
+  const modal = $('slot-modal');
   if (!modal) return;
   modal.style.display = 'none';
 }
@@ -461,8 +571,8 @@ const SLOT_SYMBOLS = ['🍒','🍋','🔔','⭐','7️⃣'];
 let slotIntervals = [];
 
 function spinSlots() {
-  const spinBtn = document.getElementById('spinBtn');
-  const resultEl = document.getElementById('slot-result');
+  const spinBtn = $('spinBtn');
+  const resultEl = $('slot-result');
   if (!spinBtn) return;
   // cost per spin
   const SPIN_COST = 350;
@@ -477,9 +587,9 @@ function spinSlots() {
   spinBtn.disabled = true;
   if (resultEl) resultEl.textContent = '... (–' + SPIN_COST + ' €)';
 
-  const r1 = document.getElementById('reel1');
-  const r2 = document.getElementById('reel2');
-  const r3 = document.getElementById('reel3');
+  const r1 = $('reel1');
+  const r2 = $('reel2');
+  const r3 = $('reel3');
   if (!r1 || !r2 || !r3) { spinBtn.disabled = false; return; }
 
   // start quick cycling for each reel
@@ -564,6 +674,9 @@ setInterval(()=>{
 // load saved state (if any) then initialize UI
 try { loadState(); } catch (e) {}
 render(); updateDirtVisual(); updateSleepButton(); updateTiredEyes();
+
+// Ensure wash button state reflects current room on load
+try { if (typeof updateWashButton === 'function') updateWashButton(); } catch (e) {}
 
 // ensure buttons reflect loaded room
 try { setMineButtonVisible(document.getElementById('game-area')?.classList.contains('mine')); } catch (e) {}

@@ -72,6 +72,21 @@ main {
   background-size: contain;
 }
 
+/* Trieda pre kúpeľňu */
+#game-area.bathroom {
+  background: url('https://cdn.discordapp.com/attachments/1230846790136234026/1441383306015936673/image0.jpg?ex=6921984f&is=692046cf&hm=f1063343afeee15affc455ca14e7b4e2ccd263955fc0c52a28744ecc4c057ccf&') no-repeat center bottom;
+  background-size: cover;
+}
+
+/* Štýl pre tlačidlo kúpeľne: jednoduché tlačidlo bez pozadia miestnosti */
+#bathroomBtn {
+  background-color: #bfe7ff;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+}
+
 /* Trieda pre kasíno */
 #game-area.casino {
   background: url('https://cdn.discordapp.com/attachments/1230846790136234026/1441108063728828609/image.png?ex=692097f8&is=691f4678&hm=b563714e32171c69dc10c395cb1dfba9292965dce7eef436ce002c47be39110a&') no-repeat center bottom;
@@ -81,7 +96,7 @@ main {
 
 /* Trieda pre baňu / baní */
 #game-area.mine {
-  background: url('https://cdn.discordapp.com/attachments/1230846790136234026/1441116140322558090/image.png?ex=69209f7e&is=691f4dfe&hm=737fef338fd35a23549639b6bc0f3877993ada90f7d43d01e16a192b984472a9&') no-repeat center bottom;
+  background: url('https://media.discordapp.net/attachments/1438861685631877274/1441337248963629067/image.png?ex=69216d6a&is=69201bea&hm=6c421bec28f5e18d18f697f719c29aa3b14ed9e822187cdf014153569989b36e&=&format=webp&quality=lossless&width=1230&height=825') no-repeat center bottom;
   background-size: cover;
   background-repeat: no-repeat;
 }
@@ -93,36 +108,13 @@ main {
   background-repeat: no-repeat;
 }
 
-/* Mining animation (pickaxe swing) */
-#mine-animation {
-  position: absolute;
-  width: 120px;
-  height: 120px;
-  right: 120px;
-  bottom: 40px;
-  pointer-events: none;
-  opacity: 0;
-  transform-origin: 20px 20px;
-}
 
-@keyframes mine-swing {
-  0% { transform: rotate(-30deg) translate(0,0); opacity: 1; }
-  40% { transform: rotate(25deg) translate(4px,-6px); }
-  80% { transform: rotate(-20deg) translate(-4px,6px); }
-  100% { transform: rotate(-30deg) translate(0,0); opacity: 0; }
-}
-
-#mine-animation.mining {
-  animation: mine-swing 2.8s ease-in-out forwards;
-  opacity: 1;
-  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120"><text x="10" y="70" font-size="60">⛏️</text></svg>') center/contain no-repeat;
-}
 
 /* Ensure mine work button is visually consistent */
 #mineWorkBtn { background-color: #ffd27a; }
 #mineWorkBtn:hover:enabled { background-color: #ffbf40; }
 
-/* Slot machine modal styles */
+/* Slot machine modal styles */ti
 .slot-modal {
   position: fixed;
   inset: 0;
@@ -132,26 +124,7 @@ main {
   background: rgba(0,0,0,0.45);
   z-index: 2000;
 }
-.smoke-puff {
-  position: absolute;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 40% 30%, rgba(255,255,255,0.9), rgba(200,200,200,0.7));
-  opacity: 0;
-  pointer-events: none;
-}
-
-@keyframes puffUp {
-  0% { transform: translate(0,0) scale(0.4); opacity: 0; }
-  20% { opacity: 0.9; }
-  100% { transform: translate(-40px, -90px) scale(1.2); opacity: 0; }
-}
-
-/* Smoke effect container positioned relative to pig */
-#smoke-effect { position: absolute; right: -10px; top: -10px; width: 120px; height: 120px; pointer-events: none; }
-#pig.smoking #smoke-effect .smoke-puff { animation: puffUp 1400ms ease-out forwards; }
-#pig.smoking .pig-head { transform: translateX(-50%) rotate(-6deg); }
+/* smoke animation moved to animation.css */
 
 .slot-content {
   background: #fff;
@@ -315,6 +288,7 @@ main {
   padding: 12px 20px;
   font-size: 16px;
   cursor: pointer;
+  margin-top: 10px;
   transition: transform 0.2s, background-color 0.2s;
   box-shadow: 0 3px 6px rgba(0,0,0,0.2);
 }
@@ -353,22 +327,73 @@ main {
   pointer-events: none;
 }
 
+
 /* Prasiatko trochu stmavne v noci */
 #pig.night {
   filter: brightness(0.8);
 }
 
+#game-area.night {
+  filter: brightness(0.45) contrast(1.1);
+  background-color: rgba(0,0,20,0.6);
+}
+
+
+
+
+
+/* Svetlo z okna (jemná žiara modrého odtieňa) */
+#window.smoked-glow {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  left: 350px;
+  top: 10px;
+  border-radius: 50%;
+  box-shadow: 0 0 80px 40px rgba(200, 255, 0, 0.35);
+  pointer-events: none;
+}
+
+
+/* Prasiatko trochu stmavne v noci */
+#pig.smoked {
+  filter: brightness(20);
+}
+#game-area.smoked {
+  filter: brightness(1) contrast(1.6);
+  background-color: rgba(255, 255, 0, 0.6);
+}
+
+
 .pig-eye.tired::after {
   content: "";
   position: absolute;
-  width: 65%;
-  height: 15px;
-  background: brown;
-  border-radius: 500%;
-  bottom: -4.5px;
+  width: 18px;
+  height: 18px;
+  background: rgba(90,60,30,0.95);
+  border-radius: 50%;
+  bottom: -6px;
   left: 50%;
   transform: translateX(-50%);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.25);
   z-index: -1;
 }
+
+.pig-eye.sfetovane::after {
+  content: "";
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  background: rgb(192,23,23);
+  border-radius: 50%;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 0 8px rgba(192,23,23,0.6);
+  z-index: -1;
+}
+
+/* Make the pupil red when sfetovane */
+.pig-eye.sfetovane .pig-pupil { background: rgb(192,23,23); box-shadow: 0 0 6px rgba(192,23,23,0.8); }
 
 

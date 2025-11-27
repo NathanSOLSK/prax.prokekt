@@ -121,17 +121,11 @@
   }
 }
 
-/* ---------- Spánok / ľahnutie na posteli (iba v spálni) ---------- */
-@keyframes lieDown {
-  0% {
-    transform: translate(0, 0) rotate(0deg);
-  }
-  50% {
-    transform: translate(-30px, 10px) rotate(-30deg);
-  }
-  100% {
-    transform: translate(-70px, 40px) rotate(-90deg);
-  }
+/* ---------- Spánok (stojaci, zavreté oči, Z Z Z) ---------- */
+@keyframes standBreathe {
+  0% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(2px) rotate(-2deg); }
+  100% { transform: translateY(0) rotate(0deg); }
 }
 
 @keyframes breathe {
@@ -140,27 +134,101 @@
   100% { transform: scale(1); }
 }
 
-/* When bedroom background is active and pig has .sleeping, animate lie-down */
+@keyframes zzUp {
+  0% { transform: translateY(0); opacity: 0; }
+  10% { opacity: 1; }
+  70% { transform: translateY(-26px); opacity: 0.9; }
+  100% { transform: translateY(-46px); opacity: 0; }
+}
+
+/* When bedroom background is active and pig has .sleeping, show standing sleep visuals */
 #game-area.bedroom #pig.sleeping {
-  animation: lieDown 1s ease-out forwards, breathe 3s ease-in-out 1s infinite;
+  animation: standBreathe 1.2s ease-in-out infinite;
   transform-origin: center center;
   z-index: 10;
+  filter: brightness(0.95);
 }
 
 /* Make eyes appear closed and hide pupils while sleeping */
 #game-area.bedroom #pig.sleeping .pig-eye {
   height: 4px;
-  transition: height 200ms ease;
+  transition: height 120ms ease;
 }
 
 #game-area.bedroom #pig.sleeping .pig-pupil {
   opacity: 0;
 }
 
-/* Slight visual fade to indicate sleeping state */
-#game-area.bedroom #pig.sleeping {
-  filter: brightness(0.95);
+/* ZZZ bubble using pseudo-element so it appears immediately when .sleeping is added */
+#game-area.bedroom #pig.sleeping::after {
+  content: "Z Z Z";
+  position: absolute;
+  right: -6px;
+  top: -8px;
+  color: rgba(255,255,255,0.95);
+  font-weight: bold;
+  font-size: 18px;
+  text-shadow: 0 1px 0 rgba(0,0,0,0.3);
+  opacity: 0;
+  pointer-events: none;
+  animation: zzUp var(--sleep-duration, 1400ms) ease-out infinite;
 }
+
+/* Prevent blink animation from showing during sleeping (double-safety) */
+#game-area.bedroom #pig.sleeping .pig-eye.blinking {
+  animation: none !important;
+  height: 4px !important;
+}
+#game-area.bedroom #pig.sleeping .pig-pupil.blinking {
+  opacity: 0 !important;
+}
+
+/* Mining animation (pickaxe swing) */
+#mine-animation {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  right: 120px;
+  bottom: 40px;
+  pointer-events: none;
+  opacity: 0;
+  transform-origin: 20px 20px;
+}
+
+@keyframes mine-swing {
+  0% { transform: rotate(-30deg) translate(0,0); opacity: 1; }
+  40% { transform: rotate(25deg) translate(4px,-6px); }
+  80% { transform: rotate(-20deg) translate(-4px,6px); }
+  100% { transform: rotate(-30deg) translate(0,0); opacity: 0; }
+}
+
+#mine-animation.mining {
+  animation: mine-swing 2.8s ease-in-out forwards;
+  opacity: 1;
+  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120"><text x="10" y="70" font-size="60">⛏️</text></svg>') center/contain no-repeat;
+}
+
+/* ---------- Smoke puff animation (moved from dizajn.css) ---------- */
+.smoke-puff {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 30%, rgba(255,255,255,0.9), rgba(200,200,200,0.7));
+  opacity: 0;
+  pointer-events: none;
+}
+
+@keyframes puffUp {
+  0% { transform: translate(0,0) scale(0.4); opacity: 0; }
+  20% { opacity: 0.9; }
+  100% { transform: translate(-40px, -90px) scale(1.2); opacity: 0; }
+}
+
+/* Smoke effect container positioned relative to pig */
+#smoke-effect { position: absolute; right: -10px; top: -10px; width: 120px; height: 120px; pointer-events: none; }
+#pig.smoking #smoke-effect .smoke-puff { animation: puffUp 1400ms ease-out forwards; }
+#pig.smoking .pig-head { transform: translateX(-50%) rotate(-6deg); }
 
 
 
